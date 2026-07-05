@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'Atelier des Mots — CM1/CM2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap');
+
+:root{
+  --ink:#2b2420;
+  --paper:#f6f1e6;
+  --paper-deep:#efe7d6;
+  --card:#fffdf7;
+  --rule:#dcd2b8;
+  --moss:#52735a;
+  --moss-deep:#3c5742;
+  --clay:#bd5d3a;
+  --clay-deep:#9c4a2c;
+  --gold:#caa23a;
+  --ok:#3f7a4f;
+  --ok-bg:#e3eee0;
+  --bad:#a7402c;
+  --bad-bg:#f6e2da;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Nunito Sans',sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  min-height:100vh;
+  padding:18px 12px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+}
+
+.container{
+  background:var(--card);
+  max-width:760px;
+  width:100%;
+  padding:28px 26px 24px;
+  position:relative;
+  border:1px solid var(--rule);
+  box-shadow:0 1px 0 var(--rule), 0 18px 40px -20px rgba(43,36,32,.35);
+}
+.container::before, .container::after{
+  content:'';position:absolute;width:14px;height:14px;
+  border:2px solid var(--gold);opacity:.55;
+}
+.container::before{top:10px;left:10px;border-right:none;border-bottom:none}
+.container::after{bottom:10px;right:10px;border-left:none;border-top:none}
+
+header{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+h1{font-family:'Fraunces',serif;font-weight:700;font-size:30px;letter-spacing:.2px}
+h1 .accent{color:var(--clay)}
+.subtitle{font-size:12.5px;color:#6b6155;font-style:italic;margin-bottom:14px;border-bottom:1px dashed var(--rule);padding-bottom:12px}
+
+/* Profils */
+.profiles{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.profile-btn{padding:6px 13px;border-radius:999px;border:1.5px solid var(--moss);background:transparent;color:var(--moss-deep);cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;transition:.2s}
+.profile-btn.active{background:var(--moss);color:#fff;border-color:var(--moss)}
+.profile-btn:hover{background:var(--moss);color:#fff}
+
+/* Difficulté */
+.difficulty-row{display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.diff-lbl{font-size:11px;font-weight:800;color:#6b6155;text-transform:uppercase;letter-spacing:.5px;margin-right:2px}
+.diff-btn{padding:5px 13px;border-radius:999px;border:1.5px solid var(--rule);background:var(--paper-deep);color:#6b6155;cursor:pointer;font-size:12px;font-weight:800;font-family:inherit;transition:.2s}
+.diff-btn:hover:not(.active){border-color:var(--moss);color:var(--moss-deep)}
+.diff-btn[data-diff="facile"].active{background:var(--ok);color:#fff;border-color:var(--ok)}
+.diff-btn[data-diff="normal"].active{background:var(--gold);color:#fff;border-color:var(--gold)}
+.diff-btn[data-diff="difficile"].active{background:var(--bad);color:#fff;border-color:var(--bad)}
+
+/* Onglets */
+.tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:6px;margin-bottom:8px}
+.tab-btn{padding:9px 6px;border:1.5px solid var(--rule);border-radius:8px;background:var(--paper-deep);cursor:pointer;font-weight:700;font-size:11.5px;font-family:inherit;color:var(--ink);transition:.18s}
+.tab-btn.active{border-color:var(--clay);background:var(--clay);color:#fff}
+.tab-btn:hover:not(.active){border-color:var(--moss);color:var(--moss-deep)}
+
+.domain-row{display:flex;gap:8px;margin:10px 0 4px;font-size:11.5px;color:#6b6155;align-items:center}
+.domain-pill{padding:4px 11px;border-radius:999px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;font-size:10px}
+.domain-pill.ortho{background:#e7ecdf;color:var(--moss-deep)}
+.domain-pill.conj{background:#f2e2cf;color:var(--clay-deep)}
+
+/* Boîte question */
+.question-box{background:var(--paper-deep);border:1px solid var(--rule);border-radius:4px;padding:20px 18px;margin:14px 0 14px;min-height:150px;position:relative}
+.question-title{font-family:'Fraunces',serif;font-size:19px;font-weight:600;margin-bottom:13px;line-height:1.4;padding-right:70px}
+.dictation-text{font-size:16px;line-height:1.8;color:var(--ink);background:var(--card);padding:14px 16px;border-radius:3px;border-left:4px solid var(--clay);margin-bottom:10px}
+
+input[type="text"]{width:100%;padding:13px 14px;font-size:16px;border:1.5px solid var(--rule);border-radius:5px;font-family:inherit;background:var(--card);color:var(--ink)}
+input[type="text"]:focus{outline:none;border-color:var(--clay)}
+
+.qcm-option{padding:13px 15px;margin:7px 0;background:var(--card);border:1.5px solid var(--rule);border-radius:6px;cursor:pointer;transition:.15s;font-size:14.5px;font-weight:600}
+.qcm-option:hover{border-color:var(--moss);background:#f1f6ee}
+.qcm-option.selected{border-color:var(--clay);background:#fbeee6}
+.qcm-option.correct{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+.qcm-option.wrong{border-color:var(--bad);background:var(--bad-bg);color:var(--bad)}
+
+/* Hint clavier */
+.kbd-hint{position:absolute;top:14px;left:18px;font-size:10px;color:#a89880;font-weight:700;letter-spacing:.2px}
+
+
+/* Boutons */
+.btn{background:var(--clay);color:#fff;border:none;padding:13px 22px;border-radius:6px;font-size:15px;font-weight:800;cursor:pointer;width:100%;transition:.18s;font-family:inherit;letter-spacing:.2px}
+.btn:hover{background:var(--clay-deep)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-secondary{background:var(--moss);font-size:12.5px;padding:10px}
+.btn-secondary:hover{background:var(--moss-deep)}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(68px,1fr));gap:8px;margin-top:16px;padding-top:14px;border-top:1px dashed var(--rule)}
+.stat{text-align:center;padding:9px 4px;background:var(--paper-deep);border-radius:6px}
+.stat-value{font-family:'Fraunces',serif;font-size:23px;font-weight:700;color:var(--clay-deep)}
+.stat-label{font-size:10px;color:#6b6155;margin-top:2px;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+
+/* Correction */
+.correction{margin-top:10px;padding:13px 14px;border-radius:5px;display:none;font-size:14px;font-weight:600;line-height:1.5}
+.correction.good{background:var(--ok-bg);color:var(--ok);border-left:4px solid var(--ok)}
+.correction.bad{background:var(--bad-bg);color:var(--bad);border-left:4px solid var(--bad)}
+.rule{font-size:12.5px;margin-top:7px;padding:7px 9px;background:rgba(255,255,255,.6);border-radius:4px;font-weight:600;color:var(--ink)}
+
+.hidden{display:none !important}
+
+/* Chrono */
+.timer{position:absolute;top:18px;right:24px;background:var(--moss-deep);color:#fff;padding:6px 14px;border-radius:999px;font-weight:800;font-size:14px;font-family:'Fraunces',serif;letter-spacing:.5px}
+.chrono-counter{position:absolute;top:18px;right:110px;background:var(--paper-deep);color:var(--ink);padding:5px 13px;border-radius:999px;font-weight:800;font-size:13px;border:1.5px solid var(--rule)}
+.chrono-result{text-align:center;padding:10px 0 6px}
+.chrono-result .big-time{font-family:'Fraunces',serif;font-size:56px;font-weight:700;color:var(--clay-deep);line-height:1}
+.chrono-result .chr-sub{font-size:13px;color:#6b6155;font-weight:700;margin-top:4px;margin-bottom:18px}
+.chrono-result .chr-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.chr-stat{background:var(--paper-deep);border:1px solid var(--rule);border-radius:8px;padding:12px 18px;text-align:center;min-width:90px}
+.chr-stat .cv{font-family:'Fraunces',serif;font-size:24px;font-weight:700;color:var(--clay-deep)}
+.chr-stat .cl{font-size:10px;text-transform:uppercase;letter-spacing:.3px;font-weight:800;color:#6b6155;margin-top:2px}
+.chr-record{font-size:12.5px;color:var(--gold);font-weight:700;margin-bottom:14px}
+
+/* Erreurs */
+.error-card{background:var(--card);border:1.5px solid var(--rule);border-radius:8px;padding:13px 14px;margin:8px 0}
+.error-card.hot{border-left:4px solid var(--bad)}
+.error-card.warm{border-left:4px solid var(--gold)}
+.error-card.cool{border-left:4px solid var(--moss)}
+.error-count-badge{display:inline-block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:#6b6155;margin-bottom:5px}
+.error-q{font-family:'Fraunces',serif;font-size:15px;font-weight:600;margin-bottom:8px;line-height:1.4}
+.error-answer{background:var(--ok-bg);color:var(--ok);padding:7px 10px;border-radius:5px;font-weight:700;font-size:13.5px;margin-bottom:6px}
+.error-rule{background:rgba(255,255,255,.65);padding:7px 10px;border-radius:5px;font-size:12.5px;color:var(--ink);font-weight:600}
+.empty-errors{text-align:center;padding:28px 0;color:#6b6155;font-size:14px}
+.empty-errors .big-emoji{font-size:42px;display:block;margin-bottom:10px}
+
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.shake{animation:shake .35s ease}
+
+/* Achievement */
+.achievement{position:fixed;top:18px;right:-320px;background:var(--card);padding:14px 18px;border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:.45s;z-index:1000;border-left:4px solid var(--gold);font-weight:700;font-size:13.5px;max-width:260px}
+.achievement.show{right:18px}
+
+/* Réglages */
+.settings{margin-top:14px;padding:14px;background:var(--paper-deep);border-radius:6px;font-size:12.5px;border:1px solid var(--rule)}
+.settings-title{font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#6b6155;margin-bottom:8px}
+.settings label{display:flex;align-items:center;margin:6px 0;cursor:pointer;font-weight:600}
+input[type="checkbox"]{margin-right:8px;width:15px;height:15px;accent-color:var(--clay)}
+.settings .btn-secondary{margin-top:8px}
+
+/* Graphique */
+.chart{margin-top:14px;padding:16px 14px 10px;background:var(--card);border:1px solid var(--rule);border-radius:6px;height:140px;display:flex;align-items:end;gap:5px}
+.bar{flex:1;background:var(--moss);border-radius:3px 3px 0 0;transition:.4s;min-height:4px;position:relative}
+.bar::after{content:attr(data-val);position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:800;color:var(--moss-deep)}
+
+/* Leçon */
+.lesson{margin-top:14px;padding:16px;background:#f2e2cf;border-radius:6px;border-left:4px solid var(--gold);display:none}
+.lesson h3{font-family:'Fraunces',serif;color:var(--clay-deep);margin-bottom:8px;font-size:17px}
+.lesson p{line-height:1.6;font-size:14px}
+.lesson .example{margin-top:8px;font-style:italic;color:#6b6155}
+
+/* Progress ring */
+.progress-ring{width:54px;height:54px;position:absolute;top:18px;left:24px}
+.progress-label{position:absolute;top:36px;left:28px;font-size:10px;font-weight:800;color:var(--clay-deep);width:46px;text-align:center}
+
+@media (max-width:480px){
+  .container{padding:20px 16px}
+  h1{font-size:24px}
+  .difficulty-row{margin-bottom:8px}
+  .question-title{font-size:16px;padding-right:56px}
+  .q-timer{font-size:13px;padding:3px 9px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <svg class="progress-ring hidden" id="progressRing" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="25" stroke="var(--rule)" stroke-width="5" fill="none"/>
+    <circle id="progressCircle" cx="30" cy="30" r="25" stroke="var(--clay)" stroke-width="5" fill="none" stroke-dasharray="157" stroke-dashoffset="157" transform="rotate(-90 30 30)" stroke-linecap="round"/>
+  </svg>
+  <div class="progress-label hidden" id="progressLabel">0/10</div>
+  <div class="timer hidden" id="timer">0s</div>
+  <div class="chrono-counter hidden" id="chronoCounter">0/20</div>
+
+  <header>
+    <h1>L'Atelier <span class="accent">des Mots</span></h1>
+  </header>
+  <p class="subtitle">Orthographe &amp; conjugaison — CM1/CM2 · présent · imparfait · futur · passé composé · conditionnel</p>
+
+  <div class="profiles" id="profiles"></div>
+
+  <div class="difficulty-row">
+    <span class="diff-lbl">Difficulté :</span>
+    <button class="diff-btn" data-diff="facile" onclick="setDifficulty('facile',this)">🟢 Facile</button>
+    <button class="diff-btn active" data-diff="normal" onclick="setDifficulty('normal',this)">🟡 Normal</button>
+    <button class="diff-btn" data-diff="difficile" onclick="setDifficulty('difficile',this)">🔴 Difficile</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="qcm" onclick="setMode('qcm', this)">📝 QCM</button>
+    <button class="tab-btn" data-mode="accords" onclick="setMode('accords', this)">🔤 Accords</button>
+    <button class="tab-btn" data-mode="conj" onclick="setMode('conj', this)">✏️ Conjugaison</button>
+    <button class="tab-btn" data-mode="sons" onclick="setMode('sons', this)">🔊 Dictée</button>
+    <button class="tab-btn" data-mode="chrono" onclick="setMode('chrono', this)">⏱️ Chrono</button>
+    <button class="tab-btn" data-mode="faibles" onclick="setMode('faibles', this)">🎯 Erreurs</button>
+    <button class="tab-btn" data-mode="leçon" onclick="setMode('leçon', this)">📚 Leçons</button>
+    <button class="tab-btn" data-mode="stats" onclick="setMode('stats', this)">📊 Stats</button>
+  </div>
+
+  <div class="domain-row" id="domainRow"></div>
+
+  <div id="game">
+    <div class="question-box">
+      <div class="question-title" id="question-title">Chargement...</div>
+      <div id="question-content"></div>
+      <div class="correction" id="correction"></div>
+      <div class="lesson" id="lesson"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="validate-btn" onclick="validate()">Valider</button>
+      <button class="btn btn-secondary hidden" id="audio-btn" onclick="playAudio()">🔊 Écouter</button>
+    </div>
+  </div>
+
+  <div class="chart hidden" id="chart"></div>
+
+  <div class="settings">
+    <div class="settings-title">Réglages</div>
+    <label><input type="checkbox" id="showRule" checked> Afficher les règles après la réponse</label>
+    <label><input type="checkbox" id="autoNext" checked> Passer automatiquement à la suite</label>
+    <label><input type="checkbox" id="saveWeak" checked> Mémoriser les erreurs pour s'entraîner dessus</label>
+    <label><input type="checkbox" id="sounds" checked> Sons de réussite</label>
+    <button class="btn btn-secondary" onclick="resetStats()">🔄 Réinitialiser mes données</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-value" id="score">0</div><div class="stat-label">Score</div></div>
+    <div class="stat"><div class="stat-value" id="streak">0</div><div class="stat-label">Série</div></div>
+    <div class="stat"><div class="stat-value" id="total">0</div><div class="stat-label">Questions</div></div>
+    <div class="stat"><div class="stat-value" id="percent">0%</div><div class="stat-label">Réussite</div></div>
+    <div class="stat"><div class="stat-value" id="level">1</div><div class="stat-label">Niveau</div></div>
+    <div class="stat"><div class="stat-value" id="xp">0</div><div class="stat-label">XP</div></div>
+  </div>
+</div>
+
+<div class="achievement" id="achievement"></div>
+
+<script>
+/* ===================== LEÇONS ===================== */
+
+const lessons = {
+  "Accords": {
+    text:"Les adjectifs et les participes passés s'accordent en genre et en nombre avec le nom ou le sujet.",
+    example:"Les fleurs rouges, un mur épais, des murs épais. Elle est arrivée. Ils sont partis."
+  },
+  "Féminin": {
+    text:"Pour former le féminin : souvent on ajoute -e. Mais attention aux irréguliers : -eur→-euse, -eur→-trice, -f→-ve, -er→-ère, -en→-enne.",
+    example:"chanteur→chanteuse, acteur→actrice, neuf→neuve, léger→légère, ancien→ancienne."
+  },
+  "Pluriels": {
+    text:"Pluriel régulier : +s. Mais -al→-aux (cheval→chevaux), -eau→-eaux (château→châteaux), et 7 mots en -ou font -oux (bijou, caillou, chou, genou, hibou, joujou, pou).",
+    example:"cheval→chevaux, château→châteaux, genou→genoux, bal→bals (exception)."
+  },
+  "Homophones": {
+    text:"Homophones courants : a/à, on/ont, son/sont, et/est, ou/où, ce/se, leur/leurs, ni/n'y, sans/s'en, quand/qu'en.",
+    example:"Il a faim (avoir) / Il va à Paris (préposition). Ils ont froid (avoir) / On joue (pronom)."
+  },
+  "É/È": {
+    text:"É (fermé) s'utilise seul ou en fin de syllabe. È (ouvert) apparaît devant une consonne suivie de e muet. L'accent circonflexe ê remplace souvent un s disparu.",
+    example:"L'été, mon père va à la pêche. Il achète. La forêt (anciennement forest)."
+  },
+  "Présent": {
+    text:"Présent en -er : -e, -es, -e, -ons, -ez, -ent. En -ir (groupe 2) : -is, -is, -it, -issons, -issez, -issent. Verbes irréguliers à mémoriser : être, avoir, aller, faire, venir, pouvoir, vouloir.",
+    example:"Je chante, tu chantes. Je finis, tu finis, il finit. Je suis, tu es, il est."
+  },
+  "Imparfait": {
+    text:"L'imparfait se termine TOUJOURS par -ais, -ais, -ait, -ions, -iez, -aient, quel que soit le verbe (même être et avoir).",
+    example:"Je jouais, tu jouais, il jouait. J'étais, tu étais, il était. J'avais, il avait."
+  },
+  "Futur": {
+    text:"Futur simple : on ajoute -rai, -ras, -ra, -rons, -rez, -ront à l'infinitif. Attention aux bases irrégulières : être→ser-, avoir→aur-, aller→ir-, faire→fer-.",
+    example:"Je chanterai, nous finirons, ils seront, j'aurai, nous irons, vous ferez."
+  },
+  "Passé composé": {
+    text:"Passé composé = auxiliaire (avoir/être au présent) + participe passé. Avec être : le participe s'accorde avec le sujet. Avec avoir : le participe s'accorde avec le COD placé AVANT.",
+    example:"Il a mangé. Elle est partie. Ils sont arrivés. Les lettres qu'il a écrites (écrites = accord avec 'que' = lettres)."
+  },
+  "Conditionnel": {
+    text:"Conditionnel présent = base du futur + terminaisons de l'imparfait (-ais, -ais, -ait, -ions, -iez, -aient). Il exprime un souhait, une hypothèse ou une demande polie.",
+    example:"Je voudrais, tu pourrais, il serait, nous irions, vous feriez, ils viendraient."
+  }
+};
+
+/* ===================== BASE DE DONNÉES QCM ===================== */
+
+const database = {
+  qcm: [
+    // --- Niveau 1 ---
+    {q:"Féminin de « paysan » :", options:["Paysanne","Paysane","Paysante"], correct:0, rule:"-an devient -anne au féminin.", lesson:"Féminin", difficulty:1},
+    {q:"Pluriel de « bijou » :", options:["Bijous","Bijoux","Bijouxs"], correct:1, rule:"bijou fait partie des 7 mots en -ou qui font -oux.", lesson:"Pluriels", difficulty:1},
+    {q:"Accord : Les filles sont ___", options:["contentes","content","contente"], correct:0, rule:"féminin pluriel : contentes.", lesson:"Accords", difficulty:1},
+    {q:"Verbe « aller », présent, avec nous :", options:["Allons","Allon","Allent"], correct:0, rule:"Nous allons — verbe irrégulier à apprendre.", lesson:"Présent", difficulty:1},
+    {q:"Féminin de « acteur » :", options:["Actrice","Acteuse","Acteure"], correct:0, rule:"-eur (verbes d'action) → -trice : acteur → actrice.", lesson:"Féminin", difficulty:1},
+    {q:"a ou à : Il ___ huit ans.", options:["a","à","as"], correct:0, rule:"'a' est le verbe avoir, remplaçable par 'avait'.", lesson:"Homophones", difficulty:1},
+    {q:"Pluriel de « château » :", options:["Châteaus","Châteaux","Châteaues"], correct:1, rule:"-eau → -eaux au pluriel.", lesson:"Pluriels", difficulty:1},
+    {q:"Choisis : Les enfants ___ leurs cahiers.", options:["range","rangent","rangents"], correct:1, rule:"Ils/elles au présent → terminaison -ent.", lesson:"Présent", difficulty:1},
+    {q:"Pluriel de « animal » :", options:["Animals","Animaux","Animales"], correct:1, rule:"-al → -aux au pluriel (sauf bal, cal, carnaval…).", lesson:"Pluriels", difficulty:1},
+    {q:"son / sont : Ils ___ arrivés.", options:["son","sont"], correct:1, rule:"'sont' = verbe être, remplaçable par 'étaient'.", lesson:"Homophones", difficulty:1},
+    // --- Niveau 2 ---
+    {q:"Choisis la bonne phrase :", options:["Ses chaussures sont neuves","C'est chaussures sont neuves","Ces chaussures sont neuves"], correct:2, multiCorrect:[0,2], rule:"'ces' (démonstratif) et 'ses' (possessif) sont tous les deux corrects ici. 'C'est' ne peut pas précéder un nom pluriel.", lesson:"Homophones", difficulty:2},
+    {q:"Quel mot est invariable ?", options:["Très","Trèsse","Trés"], correct:0, rule:"'très' est un adverbe : il ne s'accorde jamais.", lesson:"Accords", difficulty:2},
+    {q:"Complète : Il ___ du pain.", options:["achete","achète","achette"], correct:1, rule:"Devant une syllabe muette, le son [è] s'écrit è : il achète.", lesson:"É/È", difficulty:2},
+    {q:"Féminin de « directeur » :", options:["Directrice","Directeure","Directesse"], correct:0, rule:"-teur → -trice.", lesson:"Féminin", difficulty:2},
+    {q:"on / ont : Ils ___ faim.", options:["on","ont","ons"], correct:1, rule:"'ont' = verbe avoir, remplaçable par 'avaient'.", lesson:"Homophones", difficulty:2},
+    {q:"Complète : Nous ___ demain.", options:["partirons","partiron","partiront"], correct:0, rule:"Futur simple, 1ère pers. plur. : -rons.", lesson:"Futur", difficulty:2},
+    {q:"Quel verbe est bien conjugué à l'imparfait ?", options:["Je finissais","Je finissai","Je finissait"], correct:0, rule:"L'imparfait se termine toujours par -ais à la 1ère personne.", lesson:"Imparfait", difficulty:2},
+    {q:"Quelle est la bonne orthographe ?", options:["Ognion","Oignon","Ognon"], correct:1, rule:"O-I-G-N-O-N, un mot à mémoriser.", lesson:"Pluriels", difficulty:2},
+    // --- Niveau 3 ---
+    {q:"Quelle phrase est correcte ?", options:["Mon frère et moi sommes contents","Mon frère et moi sont content","Mon frère et moi est content"], correct:0, rule:"'Mon frère et moi' = nous → sommes.", lesson:"Accords", difficulty:3},
+    {q:"Féminin de « loup » :", options:["Loupe","Louve","Loupette"], correct:1, rule:"Certains féminins sont irréguliers : loup → louve.", lesson:"Féminin", difficulty:3},
+    // --- Nouvelles questions CM2 — Homophones ---
+    {q:"ce ou se : Il ___ lève tôt chaque matin.", options:["se","ce","s'e"], correct:0, rule:"'se' est le pronom réfléchi des verbes pronominaux (se lever).", lesson:"Homophones", difficulty:2},
+    {q:"ce ou se : ___ tableau est magnifique.", options:["Ce","Se","C'e"], correct:0, rule:"'ce' est un déterminant démonstratif devant un nom.", lesson:"Homophones", difficulty:2},
+    {q:"c'est ou s'est : Il ___ blessé au genou.", options:["s'est","c'est","c'était"], correct:0, rule:"'s'est' = se + est : verbe pronominal au passé composé.", lesson:"Homophones", difficulty:3},
+    {q:"c'est ou s'est : ___ une très bonne idée !", options:["C'est","S'est","C'était"], correct:0, rule:"'c'est' = ce + est, tournure impersonnelle.", lesson:"Homophones", difficulty:2},
+    {q:"leur ou leurs : Elles ont retrouvé ___ affaires.", options:["leurs","leur","leure"], correct:0, rule:"'leurs' s'accorde en nombre : plusieurs affaires → leurs.", lesson:"Accords", difficulty:2},
+    {q:"leur ou leurs : Je ___ ai expliqué la leçon.", options:["leur","leurs","leure"], correct:0, rule:"'leur' pronom est invariable (remplaçable par 'lui').", lesson:"Accords", difficulty:3},
+    {q:"ou ou où : Tu sais ___ j'habite ?", options:["où","ou","ô"], correct:0, rule:"'où' avec accent grave indique le lieu ou le moment.", lesson:"Homophones", difficulty:2},
+    {q:"ni ou n'y : Il ___ pense vraiment plus.", options:["n'y","ni","ny"], correct:0, rule:"'n'y' = ne + y (pronom adverbial : il n'y pense plus).", lesson:"Homophones", difficulty:3},
+    {q:"quand ou qu'en : ___ arriveras-tu ?", options:["Quand","Qu'en","Quant"], correct:0, rule:"'Quand' interroge sur le moment.", lesson:"Homophones", difficulty:2},
+    {q:"sans ou s'en : Elle ___ va sans rien dire.", options:["s'en","sans","sen"], correct:0, rule:"'s'en aller' → s'en = se + en (verbe pronominal).", lesson:"Homophones", difficulty:3},
+    // --- Passé composé / accords ---
+    {q:"Avec être : Les garçons sont ___.", options:["partis","parti","parties"], correct:0, rule:"Avec être, accord avec le sujet masculin pluriel : partis.", lesson:"Passé composé", difficulty:2},
+    {q:"Avec être : Les filles sont ___.", options:["parties","parti","partis"], correct:0, rule:"Avec être, accord avec le sujet féminin pluriel : parties.", lesson:"Passé composé", difficulty:3},
+    {q:"Avec avoir : Elles ont bien ___.", options:["travaillé","travaillées","travaillés"], correct:0, rule:"Avec avoir, le participe reste invariable si le COD est après.", lesson:"Passé composé", difficulty:2},
+    {q:"Accord du participe : Les lettres que j'ai ___", options:["écrites","écrit","écrits"], correct:0, rule:"'que' = les lettres (fém. plur.) avant avoir → accord : écrites.", lesson:"Passé composé", difficulty:3},
+    {q:"Accord du participe : Ils se sont ___.", options:["vus","vu","vue"], correct:0, rule:"Verbe réciproque avec être : ils (masc. plur.) → vus.", lesson:"Passé composé", difficulty:3},
+    // --- Conditionnel ---
+    {q:"Conditionnel : Je ___ bien partir en vacances.", options:["voudrais","voudrai","voulais"], correct:0, rule:"Conditionnel présent : base du futur (voudr-) + -ais.", lesson:"Conditionnel", difficulty:2},
+    {q:"Conditionnel : Elles ___ venir si elles pouvaient.", options:["pourraient","pourrait","pouraient"], correct:0, rule:"Conditionnel : pouvoir → elles pourraient (-raient).", lesson:"Conditionnel", difficulty:2},
+    {q:"Conditionnel : Il ___ partir plus tôt.", options:["devrait","devrai","devais"], correct:0, rule:"Conditionnel de 'devoir' : il devrait (base devr- + -ait).", lesson:"Conditionnel", difficulty:2},
+    // --- Pluriels difficiles ---
+    {q:"Pluriel de « travail » :", options:["Travaux","Travails","Travaillement"], correct:0, rule:"travail → travaux (pluriel irrégulier).", lesson:"Pluriels", difficulty:2},
+    {q:"Pluriel de « vitrail » :", options:["Vitraux","Vitrails","Vitraille"], correct:0, rule:"vitrail → vitraux (-ail → -aux pour ce groupe).", lesson:"Pluriels", difficulty:3},
+    {q:"Pluriel de « bail » :", options:["Baux","Bails","Baile"], correct:0, rule:"bail → baux (même famille que travail → travaux).", lesson:"Pluriels", difficulty:3},
+    // --- Orthographe difficile ---
+    {q:"Orthographe correcte ?", options:["Éléphant","Elefant","Éléfant"], correct:0, rule:"Éléphant : accent aigu sur é, -ph- pour le son f (mot grec).", lesson:"É/È", difficulty:2},
+    {q:"Orthographe correcte ?", options:["Rhume","Rume","Ruhme"], correct:0, rule:"'Rhume' commence par rh- (comme rhinocéros, rhubarbe).", lesson:"Pluriels", difficulty:2},
+    {q:"Féminin de « boulanger » :", options:["Boulangère","Boulangeuse","Boulangeresse"], correct:0, rule:"Les métiers en -er font leur féminin en -ère.", lesson:"Féminin", difficulty:2},
+    {q:"Accord : Mes parents me sont ___.", options:["chers","cher","chères"], correct:0, rule:"parents est masculin pluriel → chers.", lesson:"Accords", difficulty:2},
+    {q:"Subjonctif : Il faut que tu ___.", options:["finisses","finit","finiras"], correct:0, rule:"Après 'que', on emploie souvent le subjonctif : que tu finisses.", lesson:"Présent", difficulty:3}
+  ],
+  dictée: [
+    {phrase:"Le petit garçon joue dans le jardin.", correct:"Le petit garçon joue dans le jardin.", rule:"L'adjectif 'petit' s'accorde avec 'garçon'.", lesson:"Accords"},
+    {phrase:"Ma sœur prépare un gâteau au chocolat.", correct:"Ma sœur prépare un gâteau au chocolat.", rule:"'Sœur' s'écrit avec un œ collé (tréma sur le e).", lesson:"Féminin"},
+    {phrase:"Nous avons visité un vieux château.", correct:"Nous avons visité un vieux château.", rule:"Passé composé avec avoir, participe invariable.", lesson:"Passé composé"},
+    {phrase:"Les enfants ramassent des feuilles mortes.", correct:"Les enfants ramassent des feuilles mortes.", rule:"'Mortes' s'accorde au féminin pluriel avec 'feuilles'.", lesson:"Accords"},
+    {phrase:"Demain, nous partirons en vacances.", correct:"Demain, nous partirons en vacances.", rule:"Futur simple de partir : nous partirons.", lesson:"Futur"},
+    {phrase:"Hier, il a mangé toute la tarte.", correct:"Hier, il a mangé toute la tarte.", rule:"Passé composé : avoir au présent + participe passé.", lesson:"Passé composé"},
+    {phrase:"L'année dernière, elle habitait à la campagne.", correct:"L'année dernière, elle habitait à la campagne.", rule:"Imparfait : terminaison -ait pour 'elle'.", lesson:"Imparfait"},
+    // --- Nouvelles dictées CM2 ---
+    {phrase:"Les chevaux galopaient dans la verte prairie.", correct:"Les chevaux galopaient dans la verte prairie.", rule:"cheval → chevaux (pluriel irrégulier), galopaient (imparfait 3e plur.).", lesson:"Pluriels", difficulty:2},
+    {phrase:"Ma grand-mère a tricoté de beaux pulls bleus.", correct:"Ma grand-mère a tricoté de beaux pulls bleus.", rule:"beau → beaux (masc. plur.), pulls bleus accordé au masc. plur.", lesson:"Accords", difficulty:2},
+    {phrase:"Les hirondelles sont parties vers le sud en automne.", correct:"Les hirondelles sont parties vers le sud en automne.", rule:"Avec être, le participe s'accorde : parties (fém. plur.).", lesson:"Passé composé", difficulty:2},
+    {phrase:"Je voudrais un billet pour Paris, s'il vous plaît.", correct:"Je voudrais un billet pour Paris, s'il vous plaît.", rule:"Conditionnel de politesse : je voudrais (1ère pers. sing.).", lesson:"Conditionnel", difficulty:2},
+    {phrase:"Les journaux d'hier parlaient de cette découverte.", correct:"Les journaux d'hier parlaient de cette découverte.", rule:"journal → journaux (-al → -aux), parlaient (imparfait).", lesson:"Pluriels", difficulty:2},
+    {phrase:"Elle s'est blessée en glissant sur le verglas.", correct:"Elle s'est blessée en glissant sur le verglas.", rule:"Verbe pronominal + être : accord féminin singulier → blessée.", lesson:"Passé composé", difficulty:3},
+    {phrase:"Les fruits que nous avons cueillis étaient délicieux.", correct:"Les fruits que nous avons cueillis étaient délicieux.", rule:"COD masculin pluriel avant avoir → accord : cueillis.", lesson:"Passé composé", difficulty:3}
+  ]
+};
+
+/* ===================== MOTS CM1/CM2 — GÉNÉRATION AUTO ===================== */
+
+const motsCM1 = [
+  // --- Mots de base ---
+  "école","maison","cahier","crayon","tableau","fenêtre","porte","chaise","livre","cartable",
+  "professeur","élève","récréation","cour","ballon","corde","marelle","sauter","courir","rire",
+  "chanter","dessiner","peindre","compter","calculer","addition","soustraction","heure","minute","jour",
+  "semaine","mois","année","saison","printemps","été","automne","hiver","soleil","lune","étoile",
+  "nuage","pluie","vent","neige","froid","chaud","animal","chien","chat","oiseau","poisson",
+  "vache","cheval","mouton","cochon","poule","lapin","forêt","arbre","feuille","fleur","fruit",
+  "pomme","poire","banane","orange","légume","carotte","tomate","salade","pain","fromage","lait",
+  "eau","jus","gâteau","famille","papa","maman","frère","sœur","cousin","cousine","ami","amie",
+  "voisin","ville","rue","voiture","vélo","bus","train","avion","bateau","mer","plage","sable",
+  "vague","montagne","rivière","pont","église","château","magasin","boulangerie","marché","argent",
+  "cadeau","fête","anniversaire","musique","chanson","danse","sport","football","basket","natation",
+  "ski","jouet","poupée","puzzle","histoire","conte","princesse","chevalier","dragon","sorcière",
+  "rêve","dormir","réveil","matin","midi","soir","nuit","lumière","propre","sale","grand","petit",
+  "beau","joli","rapide","lent","fort","faible","content","triste","calme","bruyant","silence",
+  "parler","écouter","regarder","entendre","sentir","toucher","goûter","couleur","rouge","bleu",
+  "vert","jaune","noir","blanc","gris","rose","violet","marron","difficile","facile","nouveau",
+  "premier","long","court","épais","mince","lourd","léger","plein","vide","ouvert","fermé",
+  "début","fin","haut","bas","gauche","droite","devant","derrière","dessus","dessous","près",
+  "loin","vite","doucement","toujours","jamais","souvent","parfois","beaucoup","peu","assez",
+  "trop","bien","mal","mieux","pire",
+  // --- Premiers ajouts ---
+  "abriter","absent","géant","mademoiselle","monsieur","paysan","liberté","effacer","tendresse",
+  "centimètre","ardoise","fusil","humain","bandit","excuse","étranger","multicolore","sensible",
+  "grammaire","véhicule","grenouille","grotte","berceau","éléphant","sang","habitude","grâce",
+  "vallée","poteau","escalade","gamin","poussière","horloge","musicien","prison","découverte",
+  "faute","numéro","bougie",
+  // --- Liste officielle CM1 (doc) ---
+  "adorer","affiche","agent","aiguille","aimer","ainsi","allée","allonger","allumer","animer",
+  "annoncer","apercevoir","araignée","arbitre","armée","arrière","arroser","atelier","attaquer",
+  "attendre","attentif","aussitôt","automobile","avancer","avenir","aventure","avertir",
+  "bagage","baguette","baisser","bal","banc","bande","barque","billet","blessure","bond",
+  "bonheur","bout","bruit","brûler","buisson","bureau","but","bâton",
+  "caillou","caisse","calendrier","camper","canal","canne","canon","carnet","carré","cas",
+  "ceci","cercle","chagrin","changer","charmant","chauffage","chef","chêne","chéri","chiffre",
+  "choc","choisir","chute","cigarette","client","climat","cloche","coiffer","commande","commune",
+  "comparer","conserver","construire","contraire","copier","corbeau","corriger","couloir",
+  "courageux","cours","craquer","creuser","croire","cueillir","cultiver","curieux",
+  "danger","déchirer","décider","déclarer","défense","délicieux","dépenser","déposer",
+  "descendre","deviner","dévorer","dictionnaire","différent","diminuer","discuter","division",
+  "douleur","drapeau","dedans",
+  "écarter","échelle","éclairer","effort","endroit","énergie","enfermer","enlever","entier",
+  "enveloppe","épaule","épine","équipe","erreur","escalader","espace","étable","étagère",
+  "étaler","étourdi","étude","éviter","exemple","expliquer",
+  "fatigue","favorable","féroce","ficelle","figure","fil","fillette","flacon","flamme","flaque",
+  "flèche","flocon","fondre","fontaine","fossé","foule","fourrure","français","frapper","frotter",
+  "futur","fer",
+  "gazon","geler","genre","géographie","geste","gosse","gouverner","grandir","grange","gras",
+  "grenier","grille","grimper","guérir",
+  "hibou","humide","hurler",
+  "imaginer","immense","important","imprudent","incendie","indiquer","inquiet","instrument",
+  "intérieur","invention",
+  "jeter","joie","juste",
+  "kilomètre","lac","laid","limiter","liquide",
+  "malgré","manche","marque","masse","médecin","meilleur","mentir","miel","miette","mignon",
+  "millier","miroir","moineau","moitié","moment","morceau","moteur","mousse","mur",
+  "naturel","noisette","nommer","nourriture","nul",
+  "objet","observer","obstacle","océan","odeur","ordre","outil","ouvrier",
+  "paix","parole","part","participer","patin","payer","pêcher","peine","pencher","pénétrer",
+  "perdre","période","peser","peuple","pie","pierre","piquer","plaine","plaisir","plan",
+  "plaque","plier","plonger","point","porter","pot","poudre","pourtant","prairie","prince",
+  "problème","proche","profiter","profond","protéger","puisque","pur",
+  "question","quitter",
+  "race","racine","raide","ralentir","ramener","rare","rassurer","réclamer","récompense",
+  "réfléchir","refuser","régime","région","règle","remplacer","remuer","rencontrer","renverser",
+  "répéter","repos","retour","rêver","rideau","riz","rocher","ronger","rouleau","roux","ruisseau",
+  "saluer","seau","seconde","sécurité","séjour","sentiment","séparer","sérieux","serrer","service",
+  "siècle","singulier","sinon","soirée","sol","solide","sombre","soupirer","souple","sourd",
+  "souriant","souvenir","suivant","superbe","sursauter",
+  "tache","tailler","tapis","tas","tellement","tempête","tenir","tente","terrain","terrible",
+  "théâtre","tiroir","trace","tranche","traverser","trembler","trésor","trompette","tronc",
+  "trou","tuer",
+  "urgent","vapeur","vase","venger","verglas","viser","voile"
+];
+
+function genererDistracteurs(mot) {
+  const cands = [];
+  const vu = new Set([mot]);
+  function add(v) {
+    v = v.trim();
+    if(v && v.length >= 2 && !vu.has(v)){ vu.add(v); cands.push(v); }
+  }
+
+  // 1. Transposition de deux lettres adjacentes (milieu du mot en priorité)
+  const mid = Math.max(1, Math.floor(mot.length / 2));
+  for(let i = mid; i < mot.length - 1; i++){
+    if(mot[i] !== mot[i+1]){ add(mot.slice(0,i)+mot[i+1]+mot[i]+mot.slice(i+2)); break; }
+  }
+
+  // 2. Substitutions phonétiques — du plus subtil (pièges classiques CM1) au plus évident
+  //    On cherche la DERNIÈRE occurrence pour cibler les terminaisons en priorité
+  const subs = [
+    // [ɛ̃] ain / ein / in / un — confusion très fréquente
+    ['ain','ein'], ['ain','in'],  ['ain','un'],
+    ['ein','ain'], ['ein','in'],
+    ['in','ain'],  ['in','ein'],  ['in','un'],
+    ['un','in'],   ['un','ain'],
+    ['im','in'],   ['im','ain'],
+    // [ɑ̃] an / en / am / em
+    ['an','en'],  ['an','am'],
+    ['en','an'],  ['en','em'],
+    ['am','an'],  ['em','an'],  ['em','am'],
+    // [ɔ̃] on / om
+    ['on','om'],  ['om','on'],
+    // [o] eau / au / o
+    ['eau','au'], ['eau','o'],
+    ['au','eau'], ['au','o'],
+    // Accents é / è / ê / e — très fréquent
+    ['é','è'],  ['é','ê'],  ['é','e'],
+    ['è','é'],  ['è','ê'],  ['è','e'],
+    ['ê','é'],  ['ê','è'],
+    ['à','a'],  ['â','a'],  ['ù','u'],  ['û','u'],
+    ['î','i'],  ['ô','o'],  ['ç','c'],  ['ç','ss'],
+    // ph / f
+    ['ph','f'], ['f','ph'],
+    // Consonnes doubles → simples et vice versa
+    ['ll','l'],  ['mm','m'],  ['nn','n'],  ['pp','p'],
+    ['rr','r'],  ['ss','s'],  ['tt','t'],  ['ff','f'], ['dd','d'],
+    ['l','ll'],  ['m','mm'],  ['n','nn'],  ['t','tt'], ['r','rr'], ['s','ss'],
+    // Sons complexes
+    ['ill','il'],  ['ille','ile'],  ['aille','aile'],
+    ['ou','u'],    ['ou','o'],
+    ['gn','ni'],   ['gn','ng'],
+    ['qu','k'],    ['qu','c'],
+    ['ch','k'],
+    ['tion','sion'], ['tion','cion'],
+    ['ant','ent'],   ['ent','ant'],
+    ['eur','ur'],    ['eur','eure'],
+    ['er','é'],      ['er','ez'],    ['ez','é'],
+    ['ai','è'],      ['ai','é'],
+    ['ei','ai'],     ['ei','é'],
+    ['au','o'],
+    // H muet
+    ['h',''],
+  ];
+
+  for(const [a, b] of subs){
+    if(cands.length >= 2) break;
+    const idx = mot.lastIndexOf(a);
+    if(idx >= 0){
+      // Éviter les substitutions en position 0 qui allongent le mot (ex. in→ain au début = ainstrument)
+      if(idx === 0 && b.length > a.length) continue;
+      const c = mot.slice(0, idx) + b + mot.slice(idx + a.length);
+      if(c !== mot && c.length >= 2) add(c);
+    }
+  }
+
+  // 3. Fallbacks si toujours pas assez
+  const fallbacks = [mot+'s', mot.slice(0,-1)+'t', mot.slice(0,-1)+'e', mot+'e', mot+'x'];
+  for(const f of fallbacks){ if(cands.length >= 2) break; add(f); }
+
+  return cands.slice(0,2);
+}
+
+// Libellés de questions variés pour éviter la répétition
+const qLibelles = [
+  'Quelle est la bonne orthographe\u00a0?',
+  'Quel mot est bien orthographié\u00a0?',
+  'Trouve le mot correctement écrit\u00a0:',
+  'Choisis le bon mot\u00a0:'
+];
+
+motsCM1.forEach((mot, idx) => {
+  if(database.qcm.length < 600){
+    const distracteurs = genererDistracteurs(mot);
+    while(distracteurs.length < 2) distracteurs.push(mot+(distracteurs.length===0?'s':'e'));
+    const opts = [mot,...distracteurs.slice(0,2)].filter((v,i,a)=>a.indexOf(v)===i);
+    while(opts.length < 3) opts.push(mot+'t');
+    const correctIndex = opts.indexOf(mot);
+    database.qcm.push({
+      q: qLibelles[idx % qLibelles.length],
+      options: opts,
+      correct: correctIndex,
+      rule: `« ${mot} » — mot du programme CM1/CM2.`,
+      lesson: "Pluriels",
+      difficulty: mot.length > 8 ? 2 : 1
+    });
+  }
+});
+
+/* ===================== CONJUGAISON ===================== */
+
+const verbesConjugaison = [
+  {inf:"chanter", groupe:1,
+    present:["chante","chantes","chante","chantons","chantez","chantent"],
+    imparfait:["chantais","chantais","chantait","chantions","chantiez","chantaient"],
+    futur:["chanterai","chanteras","chantera","chanterons","chanterez","chanteront"],
+    pc:["ai chanté","as chanté","a chanté","avons chanté","avez chanté","ont chanté"],
+    conditionnel:["chanterais","chanterais","chanterait","chanterions","chanteriez","chanteraient"]},
+  {inf:"jouer", groupe:1,
+    present:["joue","joues","joue","jouons","jouez","jouent"],
+    imparfait:["jouais","jouais","jouait","jouions","jouiez","jouaient"],
+    futur:["jouerai","joueras","jouera","jouerons","jouerez","joueront"],
+    pc:["ai joué","as joué","a joué","avons joué","avez joué","ont joué"],
+    conditionnel:["jouerais","jouerais","jouerait","jouerions","joueriez","joueraient"]},
+  {inf:"manger", groupe:1,
+    present:["mange","manges","mange","mangeons","mangez","mangent"],
+    imparfait:["mangeais","mangeais","mangeait","mangions","mangiez","mangeaient"],
+    futur:["mangerai","mangeras","mangera","mangerons","mangerez","mangeront"],
+    pc:["ai mangé","as mangé","a mangé","avons mangé","avez mangé","ont mangé"],
+    conditionnel:["mangerais","mangerais","mangerait","mangerions","mangeriez","mangeraient"]},
+  {inf:"finir", groupe:2,
+    present:["finis","finis","finit","finissons","finissez","finissent"],
+    imparfait:["finissais","finissais","finissait","finissions","finissiez","finissaient"],
+    futur:["finirai","finiras","finira","finirons","finirez","finiront"],
+    pc:["ai fini","as fini","a fini","avons fini","avez fini","ont fini"],
+    conditionnel:["finirais","finirais","finirait","finirions","finiriez","finiraient"]},
+  {inf:"grandir", groupe:2,
+    present:["grandis","grandis","grandit","grandissons","grandissez","grandissent"],
+    imparfait:["grandissais","grandissais","grandissait","grandissions","grandissiez","grandissaient"],
+    futur:["grandirai","grandiras","grandira","grandirons","grandirez","grandiront"],
+    pc:["ai grandi","as grandi","a grandi","avons grandi","avez grandi","ont grandi"],
+    conditionnel:["grandirais","grandirais","grandirait","grandirions","grandiriez","grandiraient"]},
+  {inf:"être", groupe:3,
+    present:["suis","es","est","sommes","êtes","sont"],
+    imparfait:["étais","étais","était","étions","étiez","étaient"],
+    futur:["serai","seras","sera","serons","serez","seront"],
+    pc:["ai été","as été","a été","avons été","avez été","ont été"],
+    conditionnel:["serais","serais","serait","serions","seriez","seraient"]},
+  {inf:"avoir", groupe:3,
+    present:["ai","as","a","avons","avez","ont"],
+    imparfait:["avais","avais","avait","avions","aviez","avaient"],
+    futur:["aurai","auras","aura","aurons","aurez","auront"],
+    pc:["ai eu","as eu","a eu","avons eu","avez eu","ont eu"],
+    conditionnel:["aurais","aurais","aurait","aurions","auriez","auraient"]},
+  {inf:"aller", groupe:3,
+    present:["vais","vas","va","allons","allez","vont"],
+    imparfait:["allais","allais","allait","allions","alliez","allaient"],
+    futur:["irai","iras","ira","irons","irez","iront"],
+    pc:["suis allé","es allé","est allé","sommes allés","êtes allés","sont allés"],
+    conditionnel:["irais","irais","irait","irions","iriez","iraient"]},
+  {inf:"faire", groupe:3,
+    present:["fais","fais","fait","faisons","faites","font"],
+    imparfait:["faisais","faisais","faisait","faisions","faisiez","faisaient"],
+    futur:["ferai","feras","fera","ferons","ferez","feront"],
+    pc:["ai fait","as fait","a fait","avons fait","avez fait","ont fait"],
+    conditionnel:["ferais","ferais","ferait","ferions","feriez","feraient"]},
+  {inf:"venir", groupe:3,
+    present:["viens","viens","vient","venons","venez","viennent"],
+    imparfait:["venais","venais","venait","venions","veniez","venaient"],
+    futur:["viendrai","viendras","viendra","viendrons","viendrez","viendront"],
+    pc:["suis venu","es venu","est venu","sommes venus","êtes venus","sont venus"],
+    conditionnel:["viendrais","viendrais","viendrait","viendrions","viendriez","viendraient"]},
+  {inf:"prendre", groupe:3,
+    present:["prends","prends","prend","prenons","prenez","prennent"],
+    imparfait:["prenais","prenais","prenait","prenions","preniez","prenaient"],
+    futur:["prendrai","prendras","prendra","prendrons","prendrez","prendront"],
+    pc:["ai pris","as pris","a pris","avons pris","avez pris","ont pris"],
+    conditionnel:["prendrais","prendrais","prendrait","prendrions","prendriez","prendraient"]},
+  {inf:"voir", groupe:3,
+    present:["vois","vois","voit","voyons","voyez","voient"],
+    imparfait:["voyais","voyais","voyait","voyions","voyiez","voyaient"],
+    futur:["verrai","verras","verra","verrons","verrez","verront"],
+    pc:["ai vu","as vu","a vu","avons vu","avez vu","ont vu"],
+    conditionnel:["verrais","verrais","verrait","verrions","verriez","verraient"]},
+  {inf:"dire", groupe:3,
+    present:["dis","dis","dit","disons","dites","disent"],
+    imparfait:["disais","disais","disait","disions","disiez","disaient"],
+    futur:["dirai","diras","dira","dirons","direz","diront"],
+    pc:["ai dit","as dit","a dit","avons dit","avez dit","ont dit"],
+    conditionnel:["dirais","dirais","dirait","dirions","diriez","diraient"]},
+  {inf:"pouvoir", groupe:3,
+    present:["peux","peux","peut","pouvons","pouvez","peuvent"],
+    imparfait:["pouvais","pouvais","pouvait","pouvions","pouviez","pouvaient"],
+    futur:["pourrai","pourras","pourra","pourrons","pourrez","pourront"],
+    pc:["ai pu","as pu","a pu","avons pu","avez pu","ont pu"],
+    conditionnel:["pourrais","pourrais","pourrait","pourrions","pourriez","pourraient"]},
+  {inf:"vouloir", groupe:3,
+    present:["veux","veux","veut","voulons","voulez","veulent"],
+    imparfait:["voulais","voulais","voulait","voulions","vouliez","voulaient"],
+    futur:["voudrai","voudras","voudra","voudrons","voudrez","voudront"],
+    pc:["ai voulu","as voulu","a voulu","avons voulu","avez voulu","ont voulu"],
+    conditionnel:["voudrais","voudrais","voudrait","voudrions","voudriez","voudraient"]},
+  {inf:"partir", groupe:3,
+    present:["pars","pars","part","partons","partez","partent"],
+    imparfait:["partais","partais","partait","partions","partiez","partaient"],
+    futur:["partirai","partiras","partira","partirons","partirez","partiront"],
+    pc:["suis parti","es parti","est parti","sommes partis","êtes partis","sont partis"],
+    conditionnel:["partirais","partirais","partirait","partirions","partiriez","partiraient"]},
+  {inf:"devoir", groupe:3,
+    present:["dois","dois","doit","devons","devez","doivent"],
+    imparfait:["devais","devais","devait","devions","deviez","devaient"],
+    futur:["devrai","devras","devra","devrons","devrez","devront"],
+    pc:["ai dû","as dû","a dû","avons dû","avez dû","ont dû"],
+    conditionnel:["devrais","devrais","devrait","devrions","devriez","devraient"]},
+  {inf:"savoir", groupe:3,
+    present:["sais","sais","sait","savons","savez","savent"],
+    imparfait:["savais","savais","savait","savions","saviez","savaient"],
+    futur:["saurai","sauras","saura","saurons","saurez","sauront"],
+    pc:["ai su","as su","a su","avons su","avez su","ont su"],
+    conditionnel:["saurais","saurais","saurait","saurions","sauriez","sauraient"]}
+];
+
+const pronoms = ["Je","Tu","Il/Elle","Nous","Vous","Ils/Elles"];
+const tempsInfo = {
+  present:      {label:"présent",             lesson:"Présent"},
+  imparfait:    {label:"imparfait",            lesson:"Imparfait"},
+  futur:        {label:"futur simple",         lesson:"Futur"},
+  pc:           {label:"passé composé",        lesson:"Passé composé"},
+  conditionnel: {label:"conditionnel présent", lesson:"Conditionnel"}
+};
+
+function genererQuestionConjugaison(){
+  const verbe = verbesConjugaison[Math.floor(Math.random()*verbesConjugaison.length)];
+
+  // Sélection des temps selon la difficulté
+  const tempsParDiff = {
+    facile:    ['present','imparfait'],
+    normal:    ['present','imparfait','futur','pc'],
+    difficile: ['present','imparfait','futur','pc','conditionnel']
+  };
+  const pool = (tempsParDiff[difficulty] || tempsParDiff.normal).filter(k => verbe[k]);
+  if(!pool.length) return genererQuestionConjugaison();
+
+  const tempsKey = pool[Math.floor(Math.random()*pool.length)];
+  const idx = Math.floor(Math.random()*6);
+  const bonneForme = verbe[tempsKey][idx];
+  const pronom = pronoms[idx];
+
+  // Distracteur 1 : autre personne du même temps
+  let distracteurs = verbe[tempsKey].filter((f,i) => i !== idx && f !== bonneForme);
+  distracteurs = distracteurs.sort(()=>Math.random()-.5).slice(0,1);
+
+  // Distracteur 2 : même personne à un autre temps
+  const tousTemps = Object.keys(tempsInfo).filter(k => verbe[k]);
+  const autresTemps = tousTemps.filter(t => t !== tempsKey);
+  if(autresTemps.length){
+    const autreTemps = autresTemps[Math.floor(Math.random()*autresTemps.length)];
+    const formeAutre = verbe[autreTemps][idx];
+    if(formeAutre !== bonneForme) distracteurs.push(formeAutre);
+  }
+
+  // Distracteur 3 : variante phonétique
+  const variante = genererDistracteurs(bonneForme)[0];
+  if(variante && !distracteurs.includes(variante) && variante !== bonneForme) distracteurs.push(variante);
+
+  const options = [bonneForme, ...distracteurs].filter((v,i,a) => a.indexOf(v)===i);
+  let safety = 0;
+  while(options.length < 3 && safety++ < 20){
+    const rk = pool[Math.floor(Math.random()*pool.length)];
+    const rf = verbe[rk][Math.floor(Math.random()*6)];
+    if(!options.includes(rf)) options.push(rf);
+  }
+  if(options.length < 3) options.push(bonneForme + (options.length===1?'s':'nt'));
+
+  const finalOptions = options.slice(0,3).sort(()=>Math.random()-.5);
+  const correctIndex = finalOptions.indexOf(bonneForme);
+
+  return {
+    q:`Conjugue « ${verbe.inf} » au ${tempsInfo[tempsKey].label}, avec « ${pronom} » :`,
+    options: finalOptions,
+    correct: correctIndex,
+    rule: `${pronom} ${bonneForme} — ${tempsInfo[tempsKey].label} de « ${verbe.inf} ».`,
+    lesson: tempsInfo[tempsKey].lesson,
+    difficulty: verbe.groupe===3 || tempsKey==='conditionnel' ? 3 : (tempsKey==='imparfait'||tempsKey==='futur' ? 2 : 1)
+  };
+}
+
+/* ===================== ACCORDS ===================== */
+
+const accordsQCM = [
+  // Masculin / Féminin (niveaux 1)
+  {q:"Féminin de « beau » :", options:["Belle","Bele","Beaue"], correct:0, rule:"beau → belle au féminin.", lesson:"Accords"},
+  {q:"Féminin de « vieux » :", options:["Vieille","Vielle","Vieuse"], correct:0, rule:"vieux → vieille au féminin.", lesson:"Accords"},
+  {q:"Féminin de « blanc » :", options:["Blanche","Blanque","Blancesse"], correct:0, rule:"blanc → blanche, le c devient ch.", lesson:"Accords"},
+  {q:"Féminin de « doux » :", options:["Douce","Dousse","Douxe"], correct:0, rule:"doux → douce, le x devient ce.", lesson:"Accords"},
+  {q:"Féminin de « sportif » :", options:["Sportive","Sportife","Sporteuse"], correct:0, rule:"-if → -ive au féminin.", lesson:"Accords"},
+  {q:"Féminin de « léger » :", options:["Légère","Légéresse","Légèreuse"], correct:0, rule:"-er → -ère au féminin (accent grave).", lesson:"Accords"},
+  {q:"Féminin de « bon » :", options:["Bonne","Bone","Bonate"], correct:0, rule:"bon → bonne, la consonne double.", lesson:"Accords"},
+  {q:"Féminin de « bas » :", options:["Basse","Base","Basee"], correct:0, rule:"bas → basse, le s double.", lesson:"Accords"},
+  {q:"Féminin de « gros » :", options:["Grosse","Grose","Grossette"], correct:0, rule:"gros → grosse, le s double.", lesson:"Accords"},
+  {q:"Féminin de « neuf » :", options:["Neuve","Nieve","Neuffe"], correct:0, rule:"-f → -ve au féminin : neuf → neuve.", lesson:"Accords"},
+  {q:"Féminin de « actif » :", options:["Active","Actife","Activeuse"], correct:0, rule:"-if → -ive au féminin.", lesson:"Accords"},
+  {q:"Féminin de « heureux » :", options:["Heureuse","Heureuxe","Heureusse"], correct:0, rule:"-eux → -euse au féminin.", lesson:"Accords"},
+  {q:"Féminin de « jaloux » :", options:["Jalouse","Jalouxe","Jaloux"], correct:0, rule:"-oux → -ouse au féminin.", lesson:"Accords"},
+  {q:"Féminin de « menteur » :", options:["Menteuse","Mentrice","Menteuxe"], correct:0, rule:"-eur → -euse pour certains adjectifs.", lesson:"Accords"},
+  {q:"Féminin de « ancien » :", options:["Ancienne","Anciene","Anciensse"], correct:0, rule:"-en → -enne : la consonne double.", lesson:"Accords"},
+  {q:"Féminin de « gentil » :", options:["Gentille","Gentile","Gentilsse"], correct:0, rule:"gentil → gentille, le l double.", lesson:"Accords"},
+  {q:"Quel adjectif est au féminin ?", options:["Petite","Petit","Petites"], correct:0, rule:"Féminin singulier : on ajoute -e sans marque de pluriel.", lesson:"Accords"},
+  {q:"Quel groupe est au féminin pluriel ?", options:["Les filles contentes","Les garçons contents","Le garçon content"], correct:0, rule:"Féminin pluriel : -es à l'adjectif.", lesson:"Accords"},
+  // Singulier / Pluriel
+  {q:"Pluriel de « cheval » :", options:["Chevaux","Chevals","Chevales"], correct:0, rule:"-al → -aux au pluriel.", lesson:"Accords"},
+  {q:"Pluriel de « journal » :", options:["Journaux","Journals","Journales"], correct:0, rule:"-al → -aux au pluriel.", lesson:"Accords"},
+  {q:"Pluriel de « bal » :", options:["Bals","Baux","Bales"], correct:0, rule:"bal, carnaval, festival → -als (exceptions à -al→-aux).", lesson:"Accords"},
+  {q:"Pluriel de « pou » :", options:["Poux","Pous","Poues"], correct:0, rule:"pou fait partie des 7 mots en -ou → -oux.", lesson:"Accords"},
+  {q:"Pluriel de « genou » :", options:["Genoux","Genous","Genoues"], correct:0, rule:"genou fait partie des 7 mots en -ou → -oux.", lesson:"Accords"},
+  {q:"Pluriel de « hibou » :", options:["Hiboux","Hibous","Hiboues"], correct:0, rule:"hibou fait partie des 7 mots en -ou → -oux.", lesson:"Accords"},
+  {q:"Pluriel de « bateau » :", options:["Bateaux","Bateaus","Bateux"], correct:0, rule:"-eau → -eaux au pluriel.", lesson:"Accords"},
+  {q:"Pluriel de « gâteau » :", options:["Gâteaux","Gâteaus","Gâteux"], correct:0, rule:"-eau → -eaux au pluriel.", lesson:"Accords"},
+  {q:"Pluriel de « œil » :", options:["Yeux","Œils","Œilles"], correct:0, rule:"œil → yeux, pluriel complètement irrégulier.", lesson:"Accords"},
+  {q:"Accord : Les chiens sont ___", options:["beaux","beau","belle"], correct:0, rule:"beau → beaux au masculin pluriel.", lesson:"Accords"},
+  {q:"Accord : La robe est ___", options:["rouge","rouges","rougé"], correct:0, rule:"rouge est invariable en genre ; singulier → rouge.", lesson:"Accords"},
+  {q:"Accord : Les fleurs sont ___", options:["rouges","rouge","rougees"], correct:0, rule:"Pluriel : on ajoute -s à l'adjectif.", lesson:"Accords"},
+  {q:"Accord : Les oiseaux sont ___", options:["beaux","beau","belle"], correct:0, rule:"beau → beaux au masculin pluriel.", lesson:"Accords"},
+  // Accord sujet-verbe
+  {q:"Quel accord est correct ?", options:["Les élèves chantent","Les élèves chante","Les élèves chantons"], correct:0, rule:"3e personne du pluriel : -ent.", lesson:"Accords"},
+  {q:"Quel accord est correct ?", options:["La fille joue","La fille jouent","La fille jouons"], correct:0, rule:"3e personne du singulier : -e.", lesson:"Accords"},
+  {q:"Accord de l'adjectif : Elle est ___", options:["fatiguée","fatigué","fatiguées"], correct:0, rule:"Féminin singulier : fatigué → fatiguée.", lesson:"Accords"},
+  {q:"Accord de l'adjectif : Ils sont ___", options:["fatigués","fatiguée","fatigué"], correct:0, rule:"Masculin pluriel : fatigué → fatigués.", lesson:"Accords"},
+  {q:"Accord de l'adjectif : Elles sont ___", options:["fatiguées","fatigués","fatigué"], correct:0, rule:"Féminin pluriel : fatigué → fatiguées.", lesson:"Accords"},
+  {q:"Choisis le bon accord :", options:["Mon sac est lourd","Mon sac est lourde","Mon sac est lourds"], correct:0, rule:"sac est masculin singulier → lourd.", lesson:"Accords"},
+  {q:"Choisis le bon accord :", options:["Ma valise est lourde","Ma valise est lourd","Ma valise est lourds"], correct:0, rule:"valise est féminin singulier → lourde.", lesson:"Accords"},
+  {q:"Choisis le bon accord :", options:["Les livres sont neufs","Les livres sont neuf","Les livres sont neuve"], correct:0, rule:"Masculin pluriel : neuf → neufs.", lesson:"Accords"},
+  {q:"Féminin pluriel de « petit » :", options:["Petites","Petit","Petits"], correct:0, rule:"Féminin pluriel : -e + -s = -es.", lesson:"Accords"},
+  {q:"Masculin pluriel de « petit » :", options:["Petits","Petit","Petites"], correct:0, rule:"Masculin pluriel : on ajoute -s.", lesson:"Accords"},
+  {q:"Accord : Une belle ___ :", options:["fleur","fleurs","fleure"], correct:0, rule:"'Une belle' → singulier → fleur (sans s).", lesson:"Accords"},
+  {q:"Accord : De belles ___ :", options:["fleurs","fleur","fleure"], correct:0, rule:"'De belles' → pluriel → le nom prend -s.", lesson:"Accords"},
+  {q:"Accord : Un grand ___ :", options:["arbre","arbres","arbree"], correct:0, rule:"'Un grand' → singulier → le nom reste sans -s.", lesson:"Accords"},
+  {q:"Accord de « tout » : ___ les élèves travaillent.", options:["Tous","Tout","Toutes"], correct:0, rule:"Tous → masculin pluriel de tout.", lesson:"Accords"},
+  {q:"Accord de « tout » : ___ la classe écoute.", options:["Toute","Tout","Tous"], correct:0, rule:"Toute → féminin singulier de tout.", lesson:"Accords"},
+  {q:"Accord : Les enfants ___ dans la cour.", options:["jouent","joue","jouons"], correct:0, rule:"3e personne du pluriel → -ent.", lesson:"Accords"},
+  {q:"Accord : Mon amie est très ___", options:["gentille","gentil","gentils"], correct:0, rule:"amie est féminin → gentille.", lesson:"Accords"},
+  {q:"Accord : Ces garçons sont ___", options:["grands","grand","grande"], correct:0, rule:"Masculin pluriel → grands.", lesson:"Accords"},
+  // --- Accords difficiles CM2 ---
+  {q:"Accord : Elle s'est ___.", options:["blessée","blessé","blessées"], correct:0, rule:"Verbe pronominal + être : elle (fém. sing.) → blessée.", lesson:"Accords", difficulty:3},
+  {q:"Accord : Les résultats sont ___.", options:["brillants","brillant","brillantes"], correct:0, rule:"résultats : masculin pluriel → brillants.", lesson:"Accords", difficulty:2},
+  {q:"Accord de « même » : Ils ont les ___ yeux.", options:["mêmes","même","mêmement"], correct:0, rule:"'mêmes' s'accorde comme adjectif qualificatif.", lesson:"Accords", difficulty:3},
+  {q:"Accord : Ces livres sont ___.", options:["intéressants","intéressant","intéressantes"], correct:0, rule:"livres : masculin pluriel → intéressants.", lesson:"Accords", difficulty:2},
+  {q:"Accord : Cette maison est ___.", options:["belle","beau","beaux"], correct:0, rule:"maison : féminin singulier → belle.", lesson:"Accords", difficulty:2},
+  {q:"Accord : Les gens sont ___.", options:["contents","contentes","content"], correct:0, rule:"'Gens' prend l'accord masculin pluriel.", lesson:"Accords", difficulty:3},
+  {q:"Accord du participe : Les livres que j'ai ___.", options:["lus","lu","lue"], correct:0, rule:"COD masculin pluriel avant avoir → accord : lus.", lesson:"Accords", difficulty:3},
+  {q:"Accord : Elle m'a semblé très ___.", options:["intelligente","intelligent","intelligents"], correct:0, rule:"Elle : féminin singulier → intelligente.", lesson:"Accords", difficulty:2},
+  {q:"Accord : Toutes les filles sont ___.", options:["heureuses","heureux","heureuse"], correct:0, rule:"filles : féminin pluriel → heureuses.", lesson:"Accords", difficulty:2},
+  {q:"Accord du participe : Les lettres qu'il a ___.", options:["écrites","écrit","écrits"], correct:0, rule:"COD féminin pluriel avant avoir → accord : écrites.", lesson:"Accords", difficulty:3}
+];
+
+function genererQuestionAccords(){
+  let pool = accordsQCM;
+  if(difficulty === 'difficile'){
+    const hard = accordsQCM.filter(q => q.difficulty >= 2);
+    if(hard.length >= 4) pool = hard;
+  } else if(difficulty === 'facile'){
+    const easy = accordsQCM.filter(q => !q.difficulty || q.difficulty <= 1);
+    if(easy.length >= 4) pool = easy;
+  }
+  const q = pool[Math.floor(Math.random()*pool.length)];
+  const opts = [...q.options];
+  const correct = opts[q.correct];
+  const shuffled = opts.sort(()=>Math.random()-.5);
+  return { ...q, options:shuffled, correct:shuffled.indexOf(correct) };
+}
+
+/* ===================== ÉTAT ===================== */
+
+let mode = 'qcm';
+let difficulty = 'normal';  // 'facile' | 'normal' | 'difficile'
+let currentProfile = 'Joueur 1';
+let currentQuestion = null;
+let score = 0, streak = 0, total = 0, xp = 0, level = 1;
+let selectedOption = null;
+let timerInterval = null;
+let sansFauteCount = 0;
+let profiles = {};
+let weakPoints = [];
+let history = [];
+
+// Chrono
+let chronoPool = [];
+let chronoIndex = 0;
+let chronoElapsed = 0;
+let chronoErrors = 0;
+let chronoRunning = false;
+let chronoTotal = 20;
+
+try{ profiles = JSON.parse(localStorage.getItem('atelierProfiles')||'{}'); }catch(e){ profiles={}; }
+if(Object.keys(profiles).length===0) profiles={"Joueur 1":{}};
+
+const domainLabel = {
+  qcm:    {label:"Orthographe",    cls:"ortho"},
+  dictée: {label:"Orthographe",    cls:"ortho"},
+  sons:   {label:"Orthographe",    cls:"ortho"},
+  conj:   {label:"Conjugaison",    cls:"conj"},
+  accords:{label:"Accords",        cls:"ortho"},
+  chrono: {label:"Mixte · chrono", cls:"conj"},
+  faibles:{label:"Mes erreurs",    cls:"conj"}
+};
+
+/* ===================== PROFILS ===================== */
+
+function initProfiles(){
+  const div = document.getElementById('profiles');
+  div.innerHTML = Object.keys(profiles).map(p =>
+    `<button class="profile-btn ${p===currentProfile?'active':''}" onclick="switchProfile('${p}')">${p}</button>`
+  ).join('') + `<button class="profile-btn" onclick="addProfile()">+ Nouveau</button>`;
+  loadProfile();
+}
+
+function switchProfile(p){ saveProfile(); currentProfile=p; initProfiles(); }
+
+function addProfile(){
+  const name = prompt('Prénom du joueur :');
+  if(name && !profiles[name]){
+    profiles[name]={};
+    localStorage.setItem('atelierProfiles', JSON.stringify(profiles));
+    currentProfile=name;
+    initProfiles();
+  }
+}
+
+function saveProfile(){
+  profiles[currentProfile]={score,streak,total,xp,level,weakPoints,history,sansFauteCount};
+  localStorage.setItem('atelierProfiles', JSON.stringify(profiles));
+}
+
+function loadProfile(){
+  const p = profiles[currentProfile]||{};
+  score=p.score||0; streak=p.streak||0; total=p.total||0;
+  xp=p.xp||0; level=p.level||1;
+  weakPoints=p.weakPoints||[];
+  history=p.history||[];
+  sansFauteCount=p.sansFauteCount||0;
+  updateStats();
+  updateProgressRing();
+  newQuestion();
+}
+
+/* ===================== MODES ===================== */
+
+function setMode(m, btn){
+  mode=m;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+
+  document.getElementById('audio-btn').classList.toggle('hidden', m!=='sons');
+  document.getElementById('timer').classList.toggle('hidden', m!=='chrono');
+  document.getElementById('chronoCounter').classList.toggle('hidden', m!=='chrono');
+  document.getElementById('chart').classList.toggle('hidden', m!=='stats');
+  document.getElementById('game').classList.toggle('hidden', m==='stats');
+
+  // Afficher l'anneau de progression sauf en chrono/stats/leçon
+  const showRing = !['chrono','leçon','stats'].includes(m);
+  document.getElementById('progressRing').classList.toggle('hidden', !showRing);
+  document.getElementById('progressLabel').classList.toggle('hidden', !showRing);
+
+  clearInterval(timerInterval);
+  chronoRunning=false;
+  updateDomainRow();
+
+  if(m==='leçon') showLesson();
+  else if(m==='stats') showChart();
+  else if(m==='faibles') showFaiblesView();
+  else if(m==='chrono'){ startChrono(); newQuestion(); }
+  else newQuestion();
+}
+
+function setDifficulty(d, btn){
+  difficulty=d;
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(mode!=='stats'&&mode!=='leçon'&&mode!=='faibles') newQuestion();
+}
+
+function updateDomainRow(){
+  const info = domainLabel[mode];
+  const row = document.getElementById('domainRow');
+  if(!info||mode==='leçon'||mode==='stats'){ row.innerHTML=''; return; }
+  const diffBadge = {facile:'🟢 Facile',normal:'🟡 Normal',difficile:'🔴 Difficile'}[difficulty];
+  row.innerHTML = `<span class="domain-pill ${info.cls}">${info.label}</span><span style="font-size:11px;color:#6b6155;font-weight:700">${diffBadge}</span>`;
+}
+
+/* ===================== LEÇON ===================== */
+
+function showLesson(){
+  const names = Object.keys(lessons);
+  const name = names[Math.floor(Math.random()*names.length)];
+  const l = lessons[name];
+  document.getElementById('lesson').style.display='block';
+  document.getElementById('lesson').innerHTML=`<h3>📚 ${name}</h3><p>${l.text}</p><p class="example">Exemple : ${l.example}</p>`;
+  document.getElementById('question-title').textContent='Leçon du jour';
+  document.getElementById('question-content').innerHTML='<p style="color:#6b6155;font-size:14px">Lis attentivement, puis entraîne-toi en mode QCM ou Conjugaison !</p>';
+  document.getElementById('validate-btn').textContent="Autre leçon →";
+  document.getElementById('validate-btn').onclick=showLesson;
+  document.getElementById('validate-btn').disabled=false;
+}
+
+/* ===================== STATS ===================== */
+
+function showChart(){
+  const chart = document.getElementById('chart');
+  chart.innerHTML='';
+  const last10 = history.slice(-10);
+  if(!last10.length){
+    chart.innerHTML='<p style="color:#6b6155;font-size:13px;margin:auto">Pas encore de données — joue une partie pour voir ton graphique !</p>';
+    return;
+  }
+  const max = Math.max(...last10.map(h=>h.score),1);
+  last10.forEach(h=>{
+    const height = (h.score/max)*120+5;
+    chart.innerHTML += `<div class="bar" style="height:${height}px" data-val="${h.score}"></div>`;
+  });
+}
+
+/* ===================== FILTRAGE ===================== */
+
+function filterByDiff(pool){
+  if(difficulty==='difficile'){
+    const hard = pool.filter(q=>q.difficulty>=2);
+    return hard.length>=5 ? hard : pool;
+  }
+  if(difficulty==='facile'){
+    const easy = pool.filter(q=>!q.difficulty||q.difficulty<=1);
+    return easy.length>=5 ? easy : pool;
+  }
+  return pool;
+}
+
+/* ===================== QUESTIONS ===================== */
+
+function pickPool(){
+  if(mode==='conj'||mode==='accords') return null;
+  if(mode==='faibles') return weakPoints.length ? weakPoints : null;
+  if(mode==='sons') return filterByDiff(database.dictée);
+  return filterByDiff(database.qcm);
+}
+
+function newQuestion(){
+  document.getElementById('correction').style.display='none';
+  document.getElementById('lesson').style.display='none';
+  document.getElementById('validate-btn').disabled=false;
+  document.getElementById('validate-btn').textContent='Valider';
+  document.getElementById('validate-btn').onclick=validate;
+  selectedOption=null;
+
+  if(mode==='chrono'){
+    if(chronoIndex>=chronoTotal){ showChronoResult(); return; }
+    currentQuestion=chronoPool[chronoIndex];
+    document.getElementById('chronoCounter').textContent=`${chronoIndex}/${chronoTotal}`;
+  } else if(mode==='conj'){
+    currentQuestion=genererQuestionConjugaison();
+  } else if(mode==='accords'){
+    currentQuestion=genererQuestionAccords();
+  } else {
+    const pool=pickPool();
+    if(!pool||!pool.length){
+      document.getElementById('question-title').textContent="Pas encore d'erreurs enregistrées 🎉";
+      document.getElementById('question-content').innerHTML='<p style="color:#6b6155">Continue à t\'entraîner, tes erreurs apparaîtront ici.</p>';
+      document.getElementById('validate-btn').disabled=true;
+      return;
+    }
+    currentQuestion=pool[Math.floor(Math.random()*pool.length)];
+  }
+
+  document.getElementById('question-title').textContent = mode==='sons'
+    ? '🔊 Écoute et écris la phrase'
+    : (currentQuestion.q||currentQuestion.phrase);
+
+  const content = document.getElementById('question-content');
+  const isQCM = currentQuestion.options!==undefined;
+
+  if(isQCM){
+    const si = currentQuestion.options.map((_,i)=>i).sort(()=>Math.random()-.5);
+    currentQuestion._shuffledOptions = si.map(i=>currentQuestion.options[i]);
+    currentQuestion._shuffledCorrect = si.indexOf(currentQuestion.correct);
+    // Plusieurs bonnes réponses possibles
+    currentQuestion._shuffledMultiCorrect = currentQuestion.multiCorrect
+      ? currentQuestion.multiCorrect.map(c => si.indexOf(c))
+      : [currentQuestion._shuffledCorrect];
+    content.innerHTML = currentQuestion._shuffledOptions.map((opt,i)=>
+      `<div class="qcm-option" onclick="selectOption(${i})"><span style="color:#a89880;font-size:11px;font-weight:800;margin-right:8px">${i+1}</span>${opt}</div>`
+    ).join('');
+  } else {
+    if(mode==='sons'){
+      content.innerHTML=`<div class="dictation-text">🔊 Écoute la phrase puis écris-la</div>
+        <input type="text" id="user-input" placeholder="Tape ta réponse ici…" autocomplete="off">`;
+    } else {
+      content.innerHTML=`<div class="dictation-text">✏️ Écris : « ${currentQuestion.phrase} »</div>
+        <input type="text" id="user-input" placeholder="Tape ta réponse ici…" autocomplete="off">`;
+    }
+    setTimeout(()=>{ const el=document.getElementById('user-input'); if(el) el.focus(); },60);
+  }
+
+}
+
+function selectOption(i){
+  selectedOption=i;
+  document.querySelectorAll('.qcm-option').forEach((el,idx)=>{
+    el.classList.remove('selected','correct','wrong');
+    if(idx===i) el.classList.add('selected');
+  });
+}
+
+function playAudio(){
+  if(!currentQuestion||!currentQuestion.phrase) return;
+  const u=new SpeechSynthesisUtterance(currentQuestion.phrase);
+  u.lang='fr-FR'; u.rate=0.85; u.pitch=1.05;
+  speechSynthesis.speak(u);
+}
+
+/* ===================== CHRONO ===================== */
+
+function startChrono(){
+  chronoTotal = difficulty==='difficile' ? 25 : 20;
+  const nQcm = 10, nConj = difficulty==='difficile' ? 8 : 5, nAcc = difficulty==='difficile' ? 7 : 5;
+  const qcmPool = filterByDiff(database.qcm);
+  const qcmSample = [...qcmPool].sort(()=>Math.random()-.5).slice(0,nQcm);
+  const conjSample = Array.from({length:nConj},()=>genererQuestionConjugaison());
+  const accSample  = Array.from({length:nAcc}, ()=>genererQuestionAccords());
+  chronoPool=[...qcmSample,...conjSample,...accSample].sort(()=>Math.random()-.5);
+  chronoIndex=0; chronoElapsed=0; chronoErrors=0; chronoRunning=true;
+
+  const t=document.getElementById('timer');
+  t.textContent='0s';
+  t.style.background = difficulty==='difficile' ? 'var(--bad)' : 'var(--moss-deep)';
+  document.getElementById('chronoCounter').textContent=`0/${chronoTotal}`;
+
+  clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    if(!chronoRunning) return;
+    chronoElapsed++;
+    const m=Math.floor(chronoElapsed/60), s=chronoElapsed%60;
+    document.getElementById('timer').textContent=m>0?`${m}:${String(s).padStart(2,'0')}`:`${s}s`;
+  },1000);
+}
+
+function showChronoResult(){
+  chronoRunning=false;
+  clearInterval(timerInterval);
+  const m=Math.floor(chronoElapsed/60), s=chronoElapsed%60;
+  const timeStr=m>0?`${m}m ${s}s`:`${s}s`;
+  const correct=chronoTotal-chronoErrors;
+  const avg=(chronoElapsed/chronoTotal).toFixed(1);
+
+  const prev=profiles[currentProfile]?.chronoBest;
+  const isRecord=!prev||chronoElapsed<prev;
+  if(isRecord){ profiles[currentProfile].chronoBest=chronoElapsed; saveProfile(); }
+
+  document.getElementById('question-title').textContent='🏁 Résultat Chrono !';
+  document.getElementById('question-content').innerHTML=`
+    <div class="chrono-result">
+      <div class="big-time">${timeStr}</div>
+      <div class="chr-sub">pour ${chronoTotal} questions</div>
+      ${isRecord?`<div class="chr-record">🏆 Nouveau record !</div>`:(prev?`<div class="chr-record">Record : ${Math.floor(prev/60)>0?Math.floor(prev/60)+'m ':''}${prev%60}s</div>`:'')}
+      <div class="chr-row">
+        <div class="chr-stat"><div class="cv">${correct}</div><div class="cl">Bonnes réponses</div></div>
+        <div class="chr-stat"><div class="cv">${chronoErrors}</div><div class="cl">Erreurs (reposées)</div></div>
+        <div class="chr-stat"><div class="cv">${avg}s</div><div class="cl">Moy. / question</div></div>
+      </div>
+      <button class="btn" style="max-width:220px;margin:0 auto;display:block" onclick="startChrono();newQuestion()">🔄 Recommencer</button>
+    </div>`;
+  document.getElementById('correction').style.display='none';
+  document.getElementById('validate-btn').disabled=true;
+  document.getElementById('timer').textContent=timeStr;
+  document.getElementById('chronoCounter').textContent=`${chronoTotal}/${chronoTotal}`;
+}
+
+/* ===================== MES ERREURS ===================== */
+
+function showFaiblesView(){
+  document.getElementById('correction').style.display='none';
+  document.getElementById('lesson').style.display='none';
+  document.getElementById('validate-btn').disabled=true;
+  document.getElementById('question-title').textContent='🎯 Mes erreurs';
+
+  if(!weakPoints||!weakPoints.length){
+    document.getElementById('question-content').innerHTML=`
+      <div class="empty-errors">
+        <span class="big-emoji">🎉</span>
+        Aucune erreur enregistrée pour l'instant !<br>
+        <span style="font-size:12px;margin-top:6px;display:block">Continue à t'entraîner, tes erreurs apparaîtront ici.</span>
+      </div>`;
+    return;
+  }
+
+  const sorted=[...weakPoints].sort((a,b)=>(b._errorCount||1)-(a._errorCount||1));
+  const cards=sorted.map(w=>{
+    const n=w._errorCount||1;
+    const cls=n>=3?'hot':n>=2?'warm':'cool';
+    const icon=n>=3?'🔴':n>=2?'🟡':'🟠';
+    const ans=w.options ? w.options[w.correct] : w.correct || '—';
+    return `<div class="error-card ${cls}">
+      <div class="error-count-badge">${icon} Raté ${n} fois</div>
+      <div class="error-q">${w.q||w.phrase||''}</div>
+      <div class="error-answer">✅ Bonne réponse : <strong>${ans}</strong></div>
+      <div class="error-rule">💡 ${w.rule||'—'}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('question-content').innerHTML=`
+    ${cards}
+    <button class="btn btn-secondary" style="margin-top:12px" onclick="if(confirm('Effacer toutes les erreurs ?')){weakPoints=[];saveProfile();showFaiblesView()}">🗑️ Effacer la liste</button>`;
+}
+
+/* ===================== ANNEAU DE PROGRESSION ===================== */
+
+function updateProgressRing(){
+  const target=10;
+  const offset=157-Math.min(sansFauteCount/target,1)*157;
+  document.getElementById('progressCircle').style.strokeDashoffset=offset;
+  document.getElementById('progressLabel').textContent=`${Math.min(sansFauteCount,target)}/${target}`;
+}
+
+/* ===================== VALIDATION ===================== */
+
+function validate(){
+  if(mode!=='chrono') clearInterval(timerInterval);
+
+  const isQCM = currentQuestion.options!==undefined;
+  if(isQCM && selectedOption===null){ alert('Choisis une réponse ! (ou tape 1, 2 ou 3)'); return; }
+  if(!isQCM && !document.getElementById('user-input')?.value.trim()){ alert('Écris ta réponse !'); return; }
+
+  let isCorrect=false;
+  if(isQCM){
+    const validSI = currentQuestion._shuffledMultiCorrect;
+    isCorrect = validSI.includes(selectedOption);
+    document.querySelectorAll('.qcm-option').forEach((el,idx)=>{
+      if(validSI.includes(idx)) el.classList.add('correct');
+      else if(idx===selectedOption && !isCorrect) el.classList.add('wrong');
+    });
+  } else {
+    const raw=document.getElementById('user-input').value.trim().toLowerCase().replace(/[.,!?;:]/g,'');
+    const ref=currentQuestion.correct.toLowerCase().replace(/[.,!?;:]/g,'');
+    isCorrect=raw===ref;
+  }
+
+  total++;
+  const xpGain = difficulty==='difficile' ? 3 : difficulty==='facile' ? 1 : 2;
+
+  if(isCorrect){
+    score++; streak++; xp+=xpGain;
+    sansFauteCount++;
+    updateProgressRing();
+    if(mode==='chrono') chronoIndex++;
+    if(document.getElementById('sounds').checked) playSound(true);
+    showCorrection(true, "Bravo ! 🎉 "+(document.getElementById('showRule').checked ? currentQuestion.rule||'' : ""));
+    checkAchievements();
+  } else {
+    streak=0; sansFauteCount=0;
+    updateProgressRing();
+    if(mode==='chrono'){ chronoErrors++; chronoIndex++; }
+    if(document.getElementById('sounds').checked) playSound(false);
+
+    // Suivi des erreurs : incrémenter si déjà connu, sinon ajouter
+    const wpKey=currentQuestion.q||currentQuestion.phrase;
+    const existing=weakPoints.find(w=>(w.q||w.phrase)===wpKey);
+    if(document.getElementById('saveWeak').checked){
+      if(existing){ existing._errorCount=(existing._errorCount||1)+1; }
+      else { weakPoints.push({...currentQuestion,_errorCount:1}); if(weakPoints.length>40) weakPoints.shift(); }
+    }
+
+    const correctAnswer = isQCM
+      ? (currentQuestion.multiCorrect
+          ? currentQuestion.multiCorrect.map(i => '«\u00a0' + currentQuestion.options[i] + '\u00a0»').join(' ou ')
+          : currentQuestion.options[currentQuestion.correct])
+      : currentQuestion.correct;
+    showCorrection(false, "La bonne réponse était : <strong>"+correctAnswer+"</strong>"+
+      (document.getElementById('showRule').checked ? "<div class='rule'>💡 "+(currentQuestion.rule||'')+"</div>" : ""));
+  }
+
+  history.push({score,total,date:Date.now()});
+  if(history.length>200) history.shift();
+  const newLevel=Math.floor(xp/50)+1;
+  if(newLevel>level){ level=newLevel; showAchievement(`🎉 Niveau ${level} débloqué !`); }
+
+  updateStats(); saveProfile();
+  document.getElementById('validate-btn').disabled=true;
+
+  // Les dictées ont toujours un bouton explicite — pas d'auto-avancement
+  if(!isQCM){
+    document.getElementById('validate-btn').textContent='📝 Phrase suivante';
+    document.getElementById('validate-btn').disabled=false;
+    document.getElementById('validate-btn').onclick=newQuestion;
+  } else if(document.getElementById('autoNext').checked){
+    setTimeout(newQuestion,5000);
+  } else {
+    document.getElementById('validate-btn').textContent='Suivant →';
+    document.getElementById('validate-btn').disabled=false;
+    document.getElementById('validate-btn').onclick=newQuestion;
+  }
+}
+
+/* ===================== SONS ===================== */
+
+function playSound(success){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const notes=success?[523,659]:[294,220]; // C5-E5 ou D4-A3
+    notes.forEach((freq,i)=>{
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type=success?'sine':'triangle';
+      osc.frequency.value=freq;
+      const t=ctx.currentTime+i*0.13;
+      gain.gain.setValueAtTime(0,t);
+      gain.gain.linearRampToValueAtTime(0.12,t+0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001,t+0.32);
+      osc.start(t); osc.stop(t+0.35);
+    });
+  }catch(e){}
+}
+
+/* ===================== UTILITAIRES ===================== */
+
+function showCorrection(isGood, text){
+  const corr=document.getElementById('correction');
+  corr.className='correction '+(isGood?'good':'bad');
+  corr.innerHTML=text;
+  corr.style.display='block';
+  if(!isGood){
+    const qb=document.querySelector('.question-box');
+    qb.classList.add('shake');
+    setTimeout(()=>qb.classList.remove('shake'),350);
+  }
+}
+
+function updateStats(){
+  document.getElementById('score').textContent=score;
+  document.getElementById('streak').textContent=streak;
+  document.getElementById('total').textContent=total;
+  document.getElementById('percent').textContent=total>0?Math.round(score/total*100)+'%':'0%';
+  document.getElementById('level').textContent=level;
+  document.getElementById('xp').textContent=xp;
+}
+
+function checkAchievements(){
+  if(streak===5)  showAchievement('🔥 Série de 5 bonnes réponses !');
+  if(streak===10) showAchievement('🔥🔥 Série de 10 — incroyable !');
+  if(score===25)  showAchievement('⭐ 25 bonnes réponses !');
+  if(score===50)  showAchievement('⭐⭐ 50 bonnes réponses !');
+  if(score===100) showAchievement('🏆 100 bonnes réponses — champion !');
+  if(sansFauteCount===10) showAchievement('💎 10 sans faute d\'affilée !');
+}
+
+function showAchievement(text){
+  const a=document.getElementById('achievement');
+  a.textContent=text;
+  a.classList.add('show');
+  setTimeout(()=>a.classList.remove('show'),3200);
+}
+
+function resetStats(){
+  if(confirm('Supprimer toutes les données de '+currentProfile+' ?')){
+    score=streak=total=xp=0; level=1; weakPoints=[]; history=[]; sansFauteCount=0;
+    saveProfile(); updateStats(); updateProgressRing(); newQuestion();
+  }
+}
+
+/* ===================== CLAVIER ===================== */
+
+document.addEventListener('keydown', e => {
+  // 1 / 2 / 3 — sélectionner une option
+  if(['1','2','3'].includes(e.key)){
+    const opts=document.querySelectorAll('.qcm-option');
+    const i=parseInt(e.key)-1;
+    if(opts[i]&&!document.getElementById('validate-btn').disabled) opts[i].click();
+    return;
+  }
+  // Entrée — valider ou passer
+  if(e.key==='Enter'){
+    const btn=document.getElementById('validate-btn');
+    if(!btn.disabled) btn.click();
+  }
+});
+
+/* ===================== INIT ===================== */
+updateDomainRow();
+initProfiles();
+</script>
+</body>
+</html>
